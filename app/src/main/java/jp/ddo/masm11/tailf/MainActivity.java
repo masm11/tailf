@@ -1,6 +1,10 @@
 package jp.ddo.masm11.tailf;
 
 import android.support.v7.app.AppCompatActivity;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.AsyncTask;
 import android.view.View;
@@ -12,50 +16,48 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private class Test implements Runnable {
-	public void run() {
-	    try {
-		Log.i("MainActivity", new File(getExternalCacheDir(), "test.txt").toString());
-		new File(getExternalCacheDir(), "test.txt").createNewFile();
+    private class TailfReceiver extends BroadcastReceiver {
+	@Override
+	public void onReceive(Context context, Intent intent) {
+	    String action = intent.getAction();
+	    if (action.equals("jp.ddo.masm11.tailf.LINE")) {
+		String line = intent.getStringExtra("jp.ddo.masm11.tailf.LINE");
+		ArrayList<String> lines = intent.getStringArrayListExtra("jp.ddo.masm11.tailf.LINES");
+		// Log.d("MainActivity", line);
 		
-		BufferedReader br = new BufferedReader(
-			new InputStreamReader(
-				new EndlessFileInputStream(
-//					new File("/sdcard/Test/test.txt")
-					new File(getExternalCacheDir(), "test.txt")
-				    )));
-		while (true) {
-		    String line = br.readLine();
-		    Log.i("Test", line);
+		if (line != null) {
+		    buffer.append(line);
+		    buffer.append('\n');
+		} else {
+		    for (String str: lines) {
+			buffer.append(str);
+			buffer.append('\n');
+		    }
 		}
-	    } catch (IOException e) {
-		Log.e("MainActivity", "Error", e);
+		
+		TextView textView = (TextView)findViewById(R.id.textview);
+		assert textView != null;
+		textView.setText(buffer);
+		
+		final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
+		// scrollView.fullScroll(View.FOCUS_DOWN);
+		// scrollView.scrollTo(0, 10000);
+		// scrollView.scrollTo(0, scrollView.getBottom());
+		scrollView.post(new Runnable() {
+		    @Override
+		    public void run() {
+			scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+		    }
+		});
 	    }
 	}
     }
-/*
-    private class AdditionReader extends AsyncTask<Void, Void, Void> {
-	@Override
-	protected void onPreExecute() {
-	}
-	
-	@Override
-	protected void doInBackground() {
-	}
-	
-	@Override
-	protected void onProgressUpdate() {
-	}
-	
-	@Override
-	protected void onCancelled() {
-	}
-    }
-*/
     
     private StringBuilder buffer;
+    private TailfReceiver receiver;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,26 +69,16 @@ public class MainActivity extends AppCompatActivity {
 	
 	buffer = new StringBuilder();
 	
-	try {
-	    BufferedReader reader = new BufferedReader(new FileReader("/ueventd.rc"));
-	    while (true) {
-		String str = reader.readLine();
-		if (str == null)
-		    break;
-		buffer.append(str);
-		buffer.append('\n');
-	    }
-	} catch (IOException e) {
-	    Log.e("MainActivity", "IOException", e);
-	}
-	
 	textView.setText(buffer);
 	
-	ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
-	// scrollView.fullScroll(View.FOCUS_DOWN);
-	scrollView.scrollTo(0, 1000);
+	receiver = new TailfReceiver();
+	IntentFilter filter = new IntentFilter();
+	filter.addAction("jp.ddo.masm11.tailf.LINE");
+	registerReceiver(receiver, filter);
 	
-	Thread thr = new Thread(new Test());
-	thr.start();
+	Intent intent = new Intent(this, TailfService.class);
+	intent.setAction("jp.ddo.masm11.tailf.START");
+	intent.putExtra("jp.ddo.masm11.tailf.FILENAME", new File(getExternalCacheDir(), "test.txt").toString());
+	startService(intent);
     }
 }
