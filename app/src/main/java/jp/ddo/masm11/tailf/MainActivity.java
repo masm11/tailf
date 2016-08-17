@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ScrollView;
@@ -19,66 +20,102 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private class TailfReceiver extends BroadcastReceiver {
-	@Override
-	public void onReceive(Context context, Intent intent) {
-	    String action = intent.getAction();
-	    if (action.equals("jp.ddo.masm11.tailf.LINE")) {
-		String line = intent.getStringExtra("jp.ddo.masm11.tailf.LINE");
-		ArrayList<String> lines = intent.getStringArrayListExtra("jp.ddo.masm11.tailf.LINES");
-		// Log.d("MainActivity", line);
-		
-		if (line != null) {
-		    buffer.append(line);
-		    buffer.append('\n');
-		} else {
-		    for (String str: lines) {
-			buffer.append(str);
-			buffer.append('\n');
-		    }
-		}
-		
-		TextView textView = (TextView)findViewById(R.id.textview);
-		assert textView != null;
-		textView.setText(buffer);
-		
-		final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
-		// scrollView.fullScroll(View.FOCUS_DOWN);
-		// scrollView.scrollTo(0, 10000);
-		// scrollView.scrollTo(0, scrollView.getBottom());
-		scrollView.post(new Runnable() {
-		    @Override
-		    public void run() {
-			scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-		    }
-		});
-	    }
-	}
-    }
-    
+    private EndlessFileInputStream baseStream;
+    private BufferedReader reader;
+    private TailfThread tailfThread;
+    private Thread thread;
     private StringBuilder buffer;
-    private TailfReceiver receiver;
+    private int lineCount;
+    private Handler handler;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.activity_main);
 	
-	TextView textView = (TextView)findViewById(R.id.textview);
-	assert textView != null;
+	handler = new Handler();
 	
 	buffer = new StringBuilder();
+	lineCount = 0;
 	
-	textView.setText(buffer);
+	try {
+	    baseStream = new EndlessFileInputStream(new File(getExternalCacheDir(), "test.txt"));
+	    reader = new BufferedReader(new InputStreamReader(baseStream));
+	} catch (IOException e) {
+	    Log.e("MainActivity", "onCreate", e);
+	}
+    }
+    
+    @Override
+    protected void onResume() {
+	super.onResume();
 	
-	receiver = new TailfReceiver();
-	IntentFilter filter = new IntentFilter();
-	filter.addAction("jp.ddo.masm11.tailf.LINE");
-	registerReceiver(receiver, filter);
+	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
+	    @Override
+	    public void onRead(String line, int remaining) {
+		synchronized (buffer) {
+		    buffer.append(line);
+		    buffer.append('\n');
+		    
+		    if (++lineCount > 100) {
+			int max = buffer.length();
+			for (int i = 0; i < max; i++) {
+			    if (buffer.charAt(i) == '\n') {
+				buffer.delete(0, i + 1);
+				lineCount--;
+				break;
+			    }
+			}
+		    }
+		}
+		
+		handler.post(new Runnable() {
+		    @Override
+		    public void run() {
+			TextView textView = (TextView) findViewById(R.id.textview);
+			assert textView != null;
+			synchronized (buffer) {
+			    textView.setText(buffer);
+			}
+			
+			final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
+			scrollView.post(new Runnable() {
+			    @Override
+			    public void run() {
+				scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+			    }
+			});
+		    }
+		});
+	    }
+	});
+	thread = new Thread(tailfThread);
+	thread.start();
+    }
+    
+    @Override
+    protected void onPause() {
+	if (thread != null) {
+	    thread.interrupt();
+	    try {
+		thread.join();
+	    } catch (InterruptedException e) {
+	    }
+	    
+	    thread = null;
+	}
 	
-	Intent intent = new Intent(this, TailfService.class);
-	intent.setAction("jp.ddo.masm11.tailf.START");
-	intent.putExtra("jp.ddo.masm11.tailf.FILENAME", new File(getExternalCacheDir(), "test.txt").toString());
-	startService(intent);
+	super.onPause();
+    }
+    
+    @Override
+    protected void onDestroy() {
+	try {
+	    reader.close();
+	} catch (IOException e) {
+	    Log.e("MainActivity", "onDestroy", e);
+	}
+	
+	super.onDestroy();
     }
 }

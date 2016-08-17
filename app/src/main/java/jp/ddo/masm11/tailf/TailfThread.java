@@ -6,28 +6,28 @@ import java.io.IOException;
 import java.io.File;
 
 class TailfThread implements Runnable {
-    interface TailfReceiver {
+    interface LineListener {
 	void onRead(String line, int remaining);
     }
     
-    private final EndlessFileInputStream stream;
     private final BufferedReader reader;
-    private final TailfReceiver receiver;
+    private final EndlessFileInputStream baseStream;
+    private final LineListener lineListener;
     
-    TailfThread(File file, TailfReceiver receiver)
-	    throws IOException {
-	stream = new EndlessFileInputStream(file);
-	reader = new BufferedReader(new InputStreamReader(stream));
-	
-	this.receiver = receiver;
+    TailfThread(BufferedReader reader, EndlessFileInputStream baseStream, LineListener lineListener) {
+	this.baseStream = baseStream;
+	this.reader = reader;
+	this.lineListener = lineListener;
     }
     
     public void run() {
 	try {
 	    while (true) {
 		String line = reader.readLine();
-		int remaining = stream.available();
-		receiver.onRead(line, remaining);
+		int remaining = baseStream.available();
+		lineListener.onRead(line, remaining);
+		if (Thread.currentThread().interrupted())
+		    break;
 	    }
 	} catch (IOException e) {
 	}
