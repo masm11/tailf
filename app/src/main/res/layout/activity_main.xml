@@ -12,6 +12,7 @@
       android:layout_width="match_parent">
     
     <android.support.v7.widget.Toolbar
+	android:id="@+id/toolbar"
 	android:layout_width="match_parent"
 	android:layout_height="?attr/actionBarSize"
 	android:background="?attr/colorPrimary"
@@ -32,8 +33,8 @@
 	android:id="@+id/textview"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:background="#0000ff"
-	android:text="&lt;no data&gt;\naaa\nbbb\nccc\nddd\neee"/>
+	android:background="#00ff00"
+	android:text="&lt;no data&gt;"/>
     
   </android.support.v4.widget.NestedScrollView>
   

@@ -37,10 +37,8 @@ public class MainActivity extends AppCompatActivity {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.activity_main);
 	
-/*
 	Toolbar bar = (Toolbar) findViewById(R.id.toolbar);
 	setSupportActionBar(bar);
-*/
 	
 	handler = new Handler();
 	
