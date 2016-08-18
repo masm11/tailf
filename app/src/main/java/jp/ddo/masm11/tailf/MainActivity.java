@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
 	    @Override
 	    public void onRead(String line, int remaining) {
+		Log.d("MainActivity", line);
 		synchronized (buffer) {
 		    buffer.append(line);
 		    buffer.append('\n');

@@ -22,15 +22,16 @@
 
   <ScrollView
       android:id="@+id/scrollview"
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:fillViewport="true">
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1">
     
     <TextView
 	android:id="@+id/textview"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-	android:text="&lt;no data&gt;" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+	android:background="#ff0000"
+	android:text="&lt;no data&gt;\naaa\nbbb\nccc\nddd\neee" />
 
   </ScrollView>
 
