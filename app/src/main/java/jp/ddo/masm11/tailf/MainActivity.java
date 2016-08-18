@@ -1,6 +1,7 @@
 package jp.ddo.masm11.tailf;
 
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.content.Intent;
@@ -9,9 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.AsyncTask;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.util.Log;
+import android.app.ActionBar;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.activity_main);
 	
+	Toolbar bar = (Toolbar) findViewById(R.id.toolbar);
+	setSupportActionBar(bar);
+	
 	handler = new Handler();
 	
 	buffer = new StringBuilder();
@@ -44,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
 	} catch (IOException e) {
 	    Log.e("MainActivity", "onCreate", e);
 	}
+    }
+    
+    public boolean onCreateOptionsMenu(Menu menu) {
+	MenuInflater inflater = getMenuInflater();
+	inflater.inflate(R.menu.main, menu);
+	return true;
     }
     
     @Override
