@@ -37,8 +37,10 @@ public class MainActivity extends AppCompatActivity {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.activity_main);
 	
+/*
 	Toolbar bar = (Toolbar) findViewById(R.id.toolbar);
 	setSupportActionBar(bar);
+*/
 	
 	handler = new Handler();
 	
@@ -92,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 			    textView.setText(buffer);
 			}
 			
+/*
 			final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
 			scrollView.post(new Runnable() {
 			    @Override
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 				scrollView.fullScroll(ScrollView.FOCUS_DOWN);
 			    }
 			});
+*/
 		    }
 		});
 	    }
