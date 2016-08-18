@@ -55,12 +55,15 @@ public class MainActivity extends AppCompatActivity {
 	}
     }
     
+/*
     public boolean onCreateOptionsMenu(Menu menu) {
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.main, menu);
 	return true;
     }
+*/
     
+/*
     @Override
     protected void onResume() {
 	super.onResume();
@@ -94,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
 			    textView.setText(buffer);
 			}
 			
-/*
 			final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
 			scrollView.post(new Runnable() {
 			    @Override
@@ -102,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 				scrollView.fullScroll(ScrollView.FOCUS_DOWN);
 			    }
 			});
-*/
 		    }
 		});
 	    }
@@ -136,4 +137,5 @@ public class MainActivity extends AppCompatActivity {
 	
 	super.onDestroy();
     }
+*/
 }

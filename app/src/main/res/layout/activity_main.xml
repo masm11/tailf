@@ -26,12 +26,13 @@
       android:id="@+id/scrollview"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      app:layout_behavior="android.support.design.widget.AppBarLayout$ScrollingViewBehavior">
+      app:layout_behavior="@string/appbar_scrolling_view_behavior">
     
     <TextView
 	android:id="@+id/textview"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
+	android:background="#0000ff"
 	android:text="&lt;no data&gt;\naaa\nbbb\nccc\nddd\neee"/>
     
   </android.support.v4.widget.NestedScrollView>
