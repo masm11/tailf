@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private BufferedReader reader;
     private TailfThread tailfThread;
     private Thread thread;
-    private StringBuilder buffer;
-    private int lineCount;
+    private final StringBuilder buffer = new StringBuilder();
+    private int lineCount;	// synchronized (buffer) {} 内で。
     private Handler handler;
     
     @Override
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 	
 	handler = new Handler();
 	
-	buffer = new StringBuilder();
+	buffer.setLength(0);
 	lineCount = 0;
 	
 	try {
@@ -55,15 +55,12 @@ public class MainActivity extends AppCompatActivity {
 	}
     }
     
-/*
     public boolean onCreateOptionsMenu(Menu menu) {
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.main, menu);
 	return true;
     }
-*/
     
-/*
     @Override
     protected void onResume() {
 	super.onResume();
@@ -97,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 			    textView.setText(buffer);
 			}
 			
+/*
 			final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
 			scrollView.post(new Runnable() {
 			    @Override
@@ -104,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 				scrollView.fullScroll(ScrollView.FOCUS_DOWN);
 			    }
 			});
+*/
 		    }
 		});
 	    }
@@ -137,5 +136,4 @@ public class MainActivity extends AppCompatActivity {
 	
 	super.onDestroy();
     }
-*/
 }
