@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.Context;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.AsyncTask;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.net.Uri;
 import android.database.Cursor;
 import android.provider.DocumentsContract;
@@ -49,16 +51,6 @@ public class MainActivity extends AppCompatActivity {
 	setSupportActionBar(bar);
 	
 	handler = new Handler();
-	
-	buffer.setLength(0);
-	lineCount = 0;
-	
-	try {
-	    baseStream = new EndlessFileInputStream(new File(getExternalCacheDir(), "test.txt"));
-	    reader = new BufferedReader(new InputStreamReader(baseStream));
-	} catch (IOException e) {
-	    Log.e("MainActivity", "onCreate", e);
-	}
     }
     
     @Override
@@ -90,6 +82,11 @@ public class MainActivity extends AppCompatActivity {
 		Uri uri = data.getData();
 		File file = FileUtils.getFile(this, uri);
 		Log.d("Main", "file=" + file.toString());
+		
+		stopThread();
+		closeFile();
+		openFile(file);
+		startThread();
 	    } else
 		Log.w("Main", "data=null");
 	}
@@ -100,6 +97,91 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
 	super.onResume();
+	
+	startThread();
+    }
+    
+    @Override
+    protected void onPause() {
+	stopThread();
+	
+	super.onPause();
+    }
+    
+    @Override
+    protected void onDestroy() {
+	closeFile();
+	
+	super.onDestroy();
+    }
+    
+    private void openFile(File file) {
+	buffer.setLength(0);
+	lineCount = 0;
+	updateTextView();
+	
+	try {
+	    baseStream = new EndlessFileInputStream(file);
+	    reader = new BufferedReader(new InputStreamReader(baseStream));
+	} catch (IOException e) {
+	    Log.e("MainActivity", "onCreate", e);
+	    
+	    closeFile();
+	    
+	    AlertDialog dialog = new AlertDialog.Builder(this)
+		    .setMessage("Couldn't open the file.")
+		    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+			    
+			}
+		    })
+		    .create();
+	    dialog.show();
+	}
+    }
+    
+    private void closeFile() {
+	if (reader != null) {
+	    try {
+		reader.close();
+	    } catch (IOException e) {
+		Log.e("MainActivity", "onDestroy", e);
+	    }
+	    reader = null;
+	    baseStream =  null;
+	}
+    }
+    
+    private void updateTextView() {
+	handler.post(new Runnable() {
+	    @Override
+	    public void run() {
+		final TextView textView = (TextView) findViewById(R.id.textview);
+		assert textView != null;
+		synchronized (buffer) {
+		    textView.setText(buffer);
+		}
+		Log.d("Main", "txt.height=" + textView.getHeight());
+		
+		final NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.scrollview);
+		nestedScrollView.post(new Runnable() {
+		    @Override
+		    public void run() {
+			Log.d("Main", "scr.amount=" + nestedScrollView.getMaxScrollAmount());
+			Log.d("Main", "scr.scrollY=" + nestedScrollView.getScrollY());
+			Log.d("Main", "txt.height=" + textView.getHeight());
+			// nestedScrollView.fullScroll(NestedScrollView.FOCUS_DOWN);
+			nestedScrollView.scrollTo(0, textView.getHeight());
+		    }
+		});
+	    }
+	});
+    }
+    
+    private void startThread() {
+	if (reader == null)
+	    return;
 	
 	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
 	    @Override
@@ -121,37 +203,14 @@ public class MainActivity extends AppCompatActivity {
 		    }
 		}
 		
-		handler.post(new Runnable() {
-		    @Override
-		    public void run() {
-			final TextView textView = (TextView) findViewById(R.id.textview);
-			assert textView != null;
-			synchronized (buffer) {
-			    textView.setText(buffer);
-			}
-			Log.d("Main", "txt.height=" + textView.getHeight());
-			
-			final NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.scrollview);
-			nestedScrollView.post(new Runnable() {
-			    @Override
-			    public void run() {
-				Log.d("Main", "scr.amount=" + nestedScrollView.getMaxScrollAmount());
-				Log.d("Main", "scr.scrollY=" + nestedScrollView.getScrollY());
-				Log.d("Main", "txt.height=" + textView.getHeight());
-				// nestedScrollView.fullScroll(NestedScrollView.FOCUS_DOWN);
-				nestedScrollView.scrollTo(0, textView.getHeight());
-			    }
-			});
-		    }
-		});
+		updateTextView();
 	    }
 	});
 	thread = new Thread(tailfThread);
 	thread.start();
     }
     
-    @Override
-    protected void onPause() {
+    private void stopThread() {
 	if (thread != null) {
 	    thread.interrupt();
 	    try {
@@ -160,19 +219,7 @@ public class MainActivity extends AppCompatActivity {
 	    }
 	    
 	    thread = null;
+	    tailfThread = null;
 	}
-	
-	super.onPause();
-    }
-    
-    @Override
-    protected void onDestroy() {
-	try {
-	    reader.close();
-	} catch (IOException e) {
-	    Log.e("MainActivity", "onDestroy", e);
-	}
-	
-	super.onDestroy();
     }
 }
