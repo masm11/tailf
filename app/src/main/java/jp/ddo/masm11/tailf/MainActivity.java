@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.Context;
+import android.content.ActivityNotFoundException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.AsyncTask;
@@ -16,14 +17,19 @@ import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.util.Log;
 import android.app.ActionBar;
+import android.net.Uri;
+import android.database.Cursor;
+import android.provider.DocumentsContract;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
     private EndlessFileInputStream baseStream;
@@ -66,13 +72,30 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 	switch (item.getItemId()) {
 	case R.id.action_open:
+	    Intent intent = FileUtils.createGetContentIntent();
+	    Intent i = Intent.createChooser(intent, "Select a file");
+	    startActivityForResult(i, 0);
 	    return true;
 	    
 	default:
 	    return super.onOptionsItemSelected(item);
 	}
     }
-
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	if (requestCode == 0) {
+	    if (data != null) {
+		Uri uri = data.getData();
+		File file = FileUtils.getFile(this, uri);
+		Log.d("Main", "file=" + file.toString());
+	    } else
+		Log.w("Main", "data=null");
+	}
+	
+	super.onActivityResult(requestCode, resultCode, data);
+    }
+    
     @Override
     protected void onResume() {
 	super.onResume();
