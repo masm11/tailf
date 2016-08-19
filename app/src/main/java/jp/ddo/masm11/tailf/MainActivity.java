@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 	switch (item.getItemId()) {
 	case R.id.action_open:
 	    Intent intent = FileUtils.createGetContentIntent();
+	    intent.setType(FileUtils.MIME_TYPE_TEXT);
 	    Intent i = Intent.createChooser(intent, "Select a file");
 	    startActivityForResult(i, 0);
 	    return true;
