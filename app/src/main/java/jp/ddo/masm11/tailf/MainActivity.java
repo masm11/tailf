@@ -1,5 +1,6 @@
 package jp.ddo.masm11.tailf;
 
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.os.AsyncTask;
 import android.view.View;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -53,12 +55,24 @@ public class MainActivity extends AppCompatActivity {
 	}
     }
     
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 	MenuInflater inflater = getMenuInflater();
 	inflater.inflate(R.menu.main, menu);
 	return true;
     }
     
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+	switch (item.getItemId()) {
+	case R.id.action_open:
+	    return true;
+	    
+	default:
+	    return super.onOptionsItemSelected(item);
+	}
+    }
+
     @Override
     protected void onResume() {
 	super.onResume();
@@ -86,21 +100,24 @@ public class MainActivity extends AppCompatActivity {
 		handler.post(new Runnable() {
 		    @Override
 		    public void run() {
-			TextView textView = (TextView) findViewById(R.id.textview);
+			final TextView textView = (TextView) findViewById(R.id.textview);
 			assert textView != null;
 			synchronized (buffer) {
 			    textView.setText(buffer);
 			}
+			Log.d("Main", "txt.height=" + textView.getHeight());
 			
-/*
-			final ScrollView scrollView = (ScrollView) findViewById(R.id.scrollview);
-			scrollView.post(new Runnable() {
+			final NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.scrollview);
+			nestedScrollView.post(new Runnable() {
 			    @Override
 			    public void run() {
-				scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+				Log.d("Main", "scr.amount=" + nestedScrollView.getMaxScrollAmount());
+				Log.d("Main", "scr.scrollY=" + nestedScrollView.getScrollY());
+				Log.d("Main", "txt.height=" + textView.getHeight());
+				// nestedScrollView.fullScroll(NestedScrollView.FOCUS_DOWN);
+				nestedScrollView.scrollTo(0, textView.getHeight());
 			    }
 			});
-*/
 		    }
 		});
 	    }
