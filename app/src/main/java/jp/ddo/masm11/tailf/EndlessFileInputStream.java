@@ -39,7 +39,7 @@ class EndlessFileInputStream extends InputStream {
     private FileChannel channel;
     private MappedByteBuffer buf;
     
-    EndlessFileInputStream(File file)
+    EndlessFileInputStream(File file, int lines)
 	    throws IOException {
 	super();
 	
@@ -51,6 +51,21 @@ class EndlessFileInputStream extends InputStream {
 	
 	watcher = new Watcher(file);
 	watcher.startWatching();
+	
+	int pos = buf.limit();
+	int lfc = 0;	// line-feed count
+	while (--pos >= 0) {
+	    byte b = buf.get(pos);
+	    if ((char) b == '\n') {
+		if (++lfc > lines) {
+		    pos--;
+		    break;
+		}
+	    }
+	}
+	if (pos < 0)
+	    pos = 0;
+	buf.position(pos);
     }
     
     @Override

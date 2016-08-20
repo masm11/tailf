@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 	updateTextView();
 	
 	try {
-	    baseStream = new EndlessFileInputStream(file);
+	    baseStream = new EndlessFileInputStream(file, 100);
 	    reader = new BufferedReader(new InputStreamReader(baseStream));
 	} catch (IOException e) {
 	    Log.e(e, "ioexception");
@@ -209,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
 	    @Override
 	    public void onRead(String line, int remaining) {
 		Log.d("line=%s", line);
+		Log.d("remaining=%d", remaining);
 		synchronized (buffer) {
 		    buffer.append(line);
 		    buffer.append('\n');
