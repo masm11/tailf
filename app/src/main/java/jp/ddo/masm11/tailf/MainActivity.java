@@ -84,21 +84,14 @@ public class MainActivity extends AppCompatActivity {
 		Log.d("file=%s", file.toString());
 		
 		if (thread != null) {
-		    Log.d("stopThread.");
 		    stopThread();
-		    Log.d("closeFile.");
 		    closeFile();
-		    Log.d("openFile.");
 		    openFile(file);
-		    Log.d("startThread.");
 		    startThread();
 		} else {
-		    Log.d("closeFile.");
 		    closeFile();
-		    Log.d("openFile.");
 		    openFile(file);
 		}
-		Log.d("end.");
 	    } else
 		Log.w("data=null");
 	}
@@ -115,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     
     @Override
     protected void onPause() {
-	Log.d("stopThread.");
 	stopThread();
 	
 	super.onPause();
@@ -196,10 +188,8 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void startThread() {
-	Log.d("0");
 	if (reader == null)
 	    return;
-	Log.d("1");
 	
 	if (thread != null) {
 	    Log.w("Thread is already running.");
@@ -231,32 +221,21 @@ public class MainActivity extends AppCompatActivity {
 		    updateTextView();
 	    }
 	});
-	Log.d("2");
 	thread = new Thread(tailfThread);
-	Log.d("3");
 	thread.start();
-	Log.d("4");
     }
     
     private void stopThread() {
-	Log.d("0");
 	if (thread != null) {
-	    Log.d("1");
 	    thread.interrupt();
-	    Log.d("2");
 	    try {
-		Log.d("3");
 		thread.join();
-		Log.d("4");
 	    } catch (InterruptedException e) {
-		Log.d("5");
 		Log.w(e, "ioexception");
 	    }
-	    Log.d("6");
 	    
 	    thread = null;
 	    tailfThread = null;
 	}
-	Log.d("7");
     }
 }
