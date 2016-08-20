@@ -33,7 +33,6 @@
 	android:id="@+id/textview"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:background="#00ff00"
 	android:text="&lt;no data&gt;"/>
     
   </android.support.v4.widget.NestedScrollView>
