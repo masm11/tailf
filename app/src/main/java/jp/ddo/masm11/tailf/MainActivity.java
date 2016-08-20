@@ -83,14 +83,21 @@ public class MainActivity extends AppCompatActivity {
 		File file = FileUtils.getFile(this, uri);
 		Log.d("file=%s", file.toString());
 		
-		Log.d("stopThread.");
-		stopThread();
-		Log.d("closeFile.");
-		closeFile();
-		Log.d("openFile.");
-		openFile(file);
-		Log.d("startThread.");
-		startThread();
+		if (thread != null) {
+		    Log.d("stopThread.");
+		    stopThread();
+		    Log.d("closeFile.");
+		    closeFile();
+		    Log.d("openFile.");
+		    openFile(file);
+		    Log.d("startThread.");
+		    startThread();
+		} else {
+		    Log.d("closeFile.");
+		    closeFile();
+		    Log.d("openFile.");
+		    openFile(file);
+		}
 		Log.d("end.");
 	    } else
 		Log.w("data=null");
