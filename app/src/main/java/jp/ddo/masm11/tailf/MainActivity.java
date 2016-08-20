@@ -38,6 +38,7 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
 
 public class MainActivity extends AppCompatActivity
     implements ActivityCompat.OnRequestPermissionsResultCallback {
+    private static final int N = 1000;
     private File file;
     private EndlessFileInputStream baseStream;
     private BufferedReader reader;
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 	
 	try {
 	    baseStream = new EndlessFileInputStream(file);
-	    baseStream.seekLast(100);
+	    baseStream.seekLast(N);
 	    reader = new BufferedReader(new InputStreamReader(baseStream));
 	} catch (IOException e) {
 	    Log.e(e, "ioexception");
@@ -240,7 +241,7 @@ public class MainActivity extends AppCompatActivity
 		    buffer.append(line);
 		    buffer.append('\n');
 		    
-		    if (++lineCount > 100) {
+		    if (++lineCount > N) {
 			int max = buffer.length();
 			for (int i = 0; i < max; i++) {
 			    if (buffer.charAt(i) == '\n') {
