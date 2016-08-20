@@ -1,6 +1,8 @@
 package jp.ddo.masm11.tailf;
 
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.content.BroadcastReceiver;
@@ -9,6 +11,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.AsyncTask;
@@ -24,6 +27,7 @@ import android.app.AlertDialog;
 import android.net.Uri;
 import android.database.Cursor;
 import android.provider.DocumentsContract;
+import android.Manifest;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -32,7 +36,9 @@ import java.io.File;
 import java.util.ArrayList;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+    implements ActivityCompat.OnRequestPermissionsResultCallback {
+    private File file;
     private EndlessFileInputStream baseStream;
     private BufferedReader reader;
     private TailfThread tailfThread;
@@ -80,17 +86,24 @@ public class MainActivity extends AppCompatActivity {
 	if (requestCode == 0) {
 	    if (data != null) {
 		Uri uri = data.getData();
-		File file = FileUtils.getFile(this, uri);
+		file = FileUtils.getFile(this, uri);
 		Log.d("file=%s", file.toString());
 		
-		if (thread != null) {
-		    stopThread();
-		    closeFile();
-		    openFile(file);
-		    startThread();
+		if (FileUtils.isExternalStorageDocument(uri)) {
+		    Log.d("is external storage document.");
+		    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+			Log.d("permission not granted.");
+			String[] permissions = new String[] {
+			    Manifest.permission.READ_EXTERNAL_STORAGE,
+			};
+			ActivityCompat.requestPermissions(this, permissions, 0);
+		    } else {
+			Log.d("permission already granted.");
+			open();
+		    }
 		} else {
-		    closeFile();
-		    openFile(file);
+		    Log.d("is not external storage document.");
+		    open();
 		}
 	    } else
 		Log.w("data=null");
@@ -118,6 +131,28 @@ public class MainActivity extends AppCompatActivity {
 	closeFile();
 	
 	super.onDestroy();
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+	    String[] permissions,
+	    int[] grantResults) {
+	if (requestCode == 0) {
+	    if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+		open();
+	}
+    }
+    
+    private void open() {
+	if (thread != null) {
+	    stopThread();
+	    closeFile();
+	    openFile(file);
+	    startThread();
+	} else {
+	    closeFile();
+	    openFile(file);
+	}
     }
     
     private void openFile(File file) {

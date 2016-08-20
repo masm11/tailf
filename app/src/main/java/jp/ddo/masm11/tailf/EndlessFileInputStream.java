@@ -9,9 +9,11 @@ import java.nio.channels.FileChannel;
 import java.nio.MappedByteBuffer;
 
 class EndlessFileInputStream extends InputStream {
+/*
     private class Watcher extends FileObserver {
 	Watcher(File file) {
 	    super(file.toString(), MODIFY);
+	    Log.d("file=%s", file.toString());
 	}
 	
 	@Override
@@ -32,8 +34,53 @@ class EndlessFileInputStream extends InputStream {
 	    }
 	}
     }
+*/
+    
+    /*
+      Marshmallow では FileObserver がうまく動作しないようなので、
+      polling することにした。
+      なんか反応悪いけど…
+    */
+    private class Watcher implements Runnable {
+	private File file;
+	Watcher(File file) {
+	    this.file = file;
+	    Log.d("file=%s", file.toString());
+	}
+	public void run() {
+	    try {
+		long cur_size = -1;
+		while (true) {
+		    synchronized (EndlessFileInputStream.this) {
+			if (cur_size != channel.size()) {
+			    Log.d("size changed.");
+			    cur_size = channel.size();
+			    
+			    int pos = buf.position();
+			    try {
+				buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+				System.gc();
+			    } catch (IOException e) {
+				Log.e(e, "ioexception");
+			    }
+			    buf.position(pos);
+			    
+			    EndlessFileInputStream.this.notify();
+			}
+		    }
+		    
+		    Thread.sleep(100);
+		}
+	    } catch (InterruptedException e) {
+		Log.e(e, "interrupted.");
+	    } catch (IOException e) {
+		Log.e(e, "ioexception.");
+	    }
+	}
+    }
     
     private Watcher watcher;
+    private Thread thread;
     private File file;
     private long mark;
     private FileChannel channel;
@@ -42,6 +89,7 @@ class EndlessFileInputStream extends InputStream {
     EndlessFileInputStream(File file)
 	    throws IOException {
 	super();
+	Log.d("file=%s", file.toString());
 	
 	this.file = file;
 	FileInputStream fis = new FileInputStream(file.toString());
@@ -50,7 +98,9 @@ class EndlessFileInputStream extends InputStream {
 	buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, size);
 	
 	watcher = new Watcher(file);
-	watcher.startWatching();
+	thread = new Thread(watcher);
+	// watcher.startWatching();
+	thread.start();
     }
     
     public void seekLast(int lines) {
@@ -82,7 +132,14 @@ class EndlessFileInputStream extends InputStream {
     @Override
     public void close()
 	    throws IOException {
-	watcher.stopWatching();
+	Log.d("file=%s", file.toString());
+	// watcher.stopWatching();
+	thread.interrupt();
+	try {
+	    thread.join();
+	} catch (InterruptedException e) {
+	    Log.e(e, "interrupted.");
+	}
 	channel.close();
 	buf = null;
 	System.gc();
