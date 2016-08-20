@@ -134,7 +134,8 @@ public class MainActivity extends AppCompatActivity {
 	updateTextView();
 	
 	try {
-	    baseStream = new EndlessFileInputStream(file, 100);
+	    baseStream = new EndlessFileInputStream(file);
+	    baseStream.seekLast(100);
 	    reader = new BufferedReader(new InputStreamReader(baseStream));
 	} catch (IOException e) {
 	    Log.e(e, "ioexception");
@@ -226,7 +227,8 @@ public class MainActivity extends AppCompatActivity {
 		    }
 		}
 		
-		updateTextView();
+		if (remaining == 0)
+		    updateTextView();
 	    }
 	});
 	Log.d("2");
