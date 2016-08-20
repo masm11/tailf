@@ -21,15 +21,23 @@ class TailfThread implements Runnable {
     }
     
     public void run() {
+	Log.d("");
 	try {
 	    while (true) {
+		Log.d("1");
 		String line = reader.readLine();
+		Log.d("2");
 		int remaining = baseStream.available();
+		Log.d("3");
 		lineListener.onRead(line, remaining);
+		Log.d("4");
 		if (Thread.currentThread().interrupted())
 		    break;
+		Log.d("5");
 	    }
+	    Log.d("6");
 	} catch (IOException e) {
+	    Log.w(e, "ioexception");
 	}
     }
 }

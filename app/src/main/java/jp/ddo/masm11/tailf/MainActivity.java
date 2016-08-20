@@ -19,7 +19,6 @@ import android.view.MenuInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.util.Log;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.net.Uri;
@@ -45,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
+	Log.init(getExternalCacheDir());
 	setContentView(R.layout.activity_main);
 	
 	Toolbar bar = (Toolbar) findViewById(R.id.toolbar);
@@ -81,14 +81,19 @@ public class MainActivity extends AppCompatActivity {
 	    if (data != null) {
 		Uri uri = data.getData();
 		File file = FileUtils.getFile(this, uri);
-		Log.d("Main", "file=" + file.toString());
+		Log.d("file=%s", file.toString());
 		
+		Log.d("stopThread.");
 		stopThread();
+		Log.d("closeFile.");
 		closeFile();
+		Log.d("openFile.");
 		openFile(file);
+		Log.d("startThread.");
 		startThread();
+		Log.d("end.");
 	    } else
-		Log.w("Main", "data=null");
+		Log.w("data=null");
 	}
 	
 	super.onActivityResult(requestCode, resultCode, data);
@@ -103,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     
     @Override
     protected void onPause() {
+	Log.d("stopThread.");
 	stopThread();
 	
 	super.onPause();
@@ -124,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 	    baseStream = new EndlessFileInputStream(file);
 	    reader = new BufferedReader(new InputStreamReader(baseStream));
 	} catch (IOException e) {
-	    Log.e("MainActivity", "onCreate", e);
+	    Log.e(e, "ioexception");
 	    
 	    closeFile();
 	    
@@ -146,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 	    try {
 		reader.close();
 	    } catch (IOException e) {
-		Log.e("MainActivity", "onDestroy", e);
+		Log.e(e, "ioexception");
 	    }
 	    reader = null;
 	    baseStream =  null;
@@ -162,15 +168,17 @@ public class MainActivity extends AppCompatActivity {
 		synchronized (buffer) {
 		    textView.setText(buffer);
 		}
-		Log.d("Main", "txt.height=" + textView.getHeight());
+		Log.d("txt.height=%d", textView.getHeight());
 		
 		final NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.scrollview);
 		nestedScrollView.post(new Runnable() {
 		    @Override
 		    public void run() {
-			Log.d("Main", "scr.amount=" + nestedScrollView.getMaxScrollAmount());
-			Log.d("Main", "scr.scrollY=" + nestedScrollView.getScrollY());
-			Log.d("Main", "txt.height=" + textView.getHeight());
+/*
+			Log.d("scr.amount=%d", nestedScrollView.getMaxScrollAmount());
+			Log.d("scr.scrollY=%d", nestedScrollView.getScrollY());
+			Log.d("txt.height=%d", textView.getHeight());
+*/
 			// nestedScrollView.fullScroll(NestedScrollView.FOCUS_DOWN);
 			nestedScrollView.scrollTo(0, textView.getHeight());
 		    }
@@ -180,13 +188,18 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void startThread() {
+	Log.d("0");
 	if (reader == null)
+	    return;
+	Log.d("1");
+	
+	if (thread != null)
 	    return;
 	
 	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
 	    @Override
 	    public void onRead(String line, int remaining) {
-		Log.d("MainActivity", line);
+		Log.d("line=%s", line);
 		synchronized (buffer) {
 		    buffer.append(line);
 		    buffer.append('\n');
@@ -206,20 +219,32 @@ public class MainActivity extends AppCompatActivity {
 		updateTextView();
 	    }
 	});
+	Log.d("2");
 	thread = new Thread(tailfThread);
+	Log.d("3");
 	thread.start();
+	Log.d("4");
     }
     
     private void stopThread() {
+	Log.d("0");
 	if (thread != null) {
+	    Log.d("1");
 	    thread.interrupt();
+	    Log.d("2");
 	    try {
+		Log.d("3");
 		thread.join();
+		Log.d("4");
 	    } catch (InterruptedException e) {
+		Log.d("5");
+		Log.w(e, "ioexception");
 	    }
+	    Log.d("6");
 	    
 	    thread = null;
 	    tailfThread = null;
 	}
+	Log.d("7");
     }
 }

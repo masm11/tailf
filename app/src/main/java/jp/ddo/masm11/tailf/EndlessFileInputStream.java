@@ -16,7 +16,7 @@ class EndlessFileInputStream extends InputStream {
 	
 	@Override
 	public void onEvent(int event, String path) {
-	    android.util.Log.d("Watcher", "onEvent called.");
+	    Log.d("called.");
 	    
 	    synchronized (EndlessFileInputStream.this) {
 		int pos = buf.position();
@@ -24,7 +24,7 @@ class EndlessFileInputStream extends InputStream {
 		    buf = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
 		    System.gc();
 		} catch (IOException e) {
-		    android.util.Log.e("EndlessFileInputStream", "onEvent", e);
+		    Log.e(e, "ioexception");
 		}
 		buf.position(pos);
 		
@@ -55,7 +55,9 @@ class EndlessFileInputStream extends InputStream {
     
     @Override
     public int available() {
+	Log.d(new Exception("Debug"), "");
 	synchronized (this) {
+	    Log.d("remaining=%d", buf.remaining());
 	    return buf.remaining();
 	}
     }
@@ -63,6 +65,7 @@ class EndlessFileInputStream extends InputStream {
     @Override
     public void close()
 	    throws IOException {
+	Log.d("");
 	watcher.stopWatching();
 	channel.close();
 	buf = null;
@@ -71,6 +74,7 @@ class EndlessFileInputStream extends InputStream {
     
     @Override
     public void mark(int readlimit) {
+	Log.d("");
 	synchronized (this) {
 	    mark = buf.position();
 	}
@@ -78,12 +82,14 @@ class EndlessFileInputStream extends InputStream {
     
     @Override
     public boolean markSupported() {
+	Log.d("");
 	return true;
     }
     
     @Override
     public int read()
 	    throws IOException {
+	Log.d("");
 	synchronized (this) {
 	    while (buf.remaining() <= 0) {
 		try {
@@ -99,23 +105,34 @@ class EndlessFileInputStream extends InputStream {
     @Override
     public int read(byte[] b, int off, int len)
 	    throws IOException {
+	Log.d(new Exception("Debug"), "0: off=%d, len=%d.", off, len);
 	synchronized (this) {
+	    Log.d("1");
 	    while (buf.remaining() <= 0) {
+		Log.d("2");
 		try {
+		    Log.d("3");
 		    wait();
+		    Log.d("4");
 		} catch (InterruptedException e) {
+		    Log.d(e, "5");
 		    throw new IOException(e);
+		} catch (Throwable e) {
+		    Log.d(e, "!!!");
 		}
 	    }
+	    Log.d("6");
 	    if (len > buf.remaining())
 		len = buf.remaining();
 	    buf.get(b, off, len);
+	    Log.d("7");
 	    return len;
 	}
     }
     
     @Override
     public void reset() {
+	Log.d("");
 	synchronized (this) {
 	    buf.position((int) mark);
 	}
@@ -123,6 +140,7 @@ class EndlessFileInputStream extends InputStream {
     
     @Override
     public long skip(long n) {
+	Log.d("");
 	if (n < 0)
 	    return 0;
 	synchronized (this) {
