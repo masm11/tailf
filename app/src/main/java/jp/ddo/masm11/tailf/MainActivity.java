@@ -200,8 +200,10 @@ public class MainActivity extends AppCompatActivity {
 	    return;
 	Log.d("1");
 	
-	if (thread != null)
+	if (thread != null) {
+	    Log.w("Thread is already running.");
 	    return;
+	}
 	
 	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
 	    @Override
