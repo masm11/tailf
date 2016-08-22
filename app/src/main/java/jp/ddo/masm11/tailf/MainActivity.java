@@ -58,6 +58,22 @@ public class MainActivity extends AppCompatActivity
 	setSupportActionBar(bar);
 	
 	handler = new Handler();
+	
+	if (savedInstanceState != null) {
+	    Log.d("savedInstanceState exists.");
+	    file = (File) savedInstanceState.getSerializable("file");
+	    if (file != null) {
+		Log.d("savedInstanceState: file=%s", file.toString());
+		openFile(file);
+	    }
+	}
+    }
+    
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+	Log.d("");
+	super.onSaveInstanceState(outState);
+	outState.putSerializable("file", file);
     }
     
     @Override
