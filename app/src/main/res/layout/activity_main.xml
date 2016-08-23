@@ -23,18 +23,12 @@
     
   </android.support.design.widget.AppBarLayout>
   
-  <android.support.v4.widget.NestedScrollView
-      android:id="@+id/scrollview"
+  <ListView
+      android:id="@+id/listview"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    
-    <TextView
-	android:id="@+id/textview"
-	android:layout_width="match_parent"
-	android:layout_height="wrap_content"
-	android:text="&lt;no data&gt;"/>
-    
-  </android.support.v4.widget.NestedScrollView>
+      android:divider="@null"
+      android:dividerHeight="0dp"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
   
 </android.support.design.widget.CoordinatorLayout>

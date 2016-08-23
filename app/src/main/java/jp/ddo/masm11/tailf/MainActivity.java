@@ -5,6 +5,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.support.v4.view.ViewCompat;	// v13 にもあるが…?
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.content.Intent;
@@ -21,7 +22,9 @@ import android.view.MenuItem;
 import android.view.MenuInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.ArrayAdapter;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.net.Uri;
@@ -44,9 +47,13 @@ public class MainActivity extends AppCompatActivity
     private BufferedReader reader;
     private TailfThread tailfThread;
     private Thread thread;
+/*
     private final StringBuilder buffer = new StringBuilder();
+*/
     private int lineCount;	// synchronized (buffer) {} 内で。
     private Handler handler;
+    
+    private ArrayAdapter<String> adapter;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +65,12 @@ public class MainActivity extends AppCompatActivity
 	setSupportActionBar(bar);
 	
 	handler = new Handler();
+	
+//	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+	adapter = new ArrayAdapter<String>(this, R.xml.line_layout);
+	ListView listView = (ListView) findViewById(R.id.listview);
+	listView.setAdapter(adapter);
+	ViewCompat.setNestedScrollingEnabled(listView, true);
 	
 	if (savedInstanceState != null) {
 	    Log.d("savedInstanceState exists.");
@@ -173,7 +186,8 @@ public class MainActivity extends AppCompatActivity
     }
     
     private void openFile(File file) {
-	buffer.setLength(0);
+	// buffer.setLength(0);
+	adapter.clear();
 	lineCount = 0;
 	updateTextView();
 	
@@ -215,26 +229,31 @@ public class MainActivity extends AppCompatActivity
 	handler.post(new Runnable() {
 	    @Override
 	    public void run() {
+/*
 		final TextView textView = (TextView) findViewById(R.id.textview);
 		assert textView != null;
+*/
+/*
 		synchronized (buffer) {
 		    textView.setText(buffer);
 		}
+*/
+/*
 		Log.d("txt.height=%d", textView.getHeight());
-		
+*/
+/*
 		final NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.scrollview);
 		nestedScrollView.post(new Runnable() {
 		    @Override
 		    public void run() {
-/*
 			Log.d("scr.amount=%d", nestedScrollView.getMaxScrollAmount());
 			Log.d("scr.scrollY=%d", nestedScrollView.getScrollY());
 			Log.d("txt.height=%d", textView.getHeight());
-*/
 			// nestedScrollView.fullScroll(NestedScrollView.FOCUS_DOWN);
 			nestedScrollView.scrollTo(0, textView.getHeight());
 		    }
 		});
+*/
 	    }
 	});
     }
@@ -250,9 +269,20 @@ public class MainActivity extends AppCompatActivity
 	
 	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
 	    @Override
-	    public void onRead(String line, int remaining) {
+	    public void onRead(final String line, int remaining) {
 		Log.d("line=%s", line);
 		Log.d("remaining=%d", remaining);
+		handler.post(new Runnable() {
+		    @Override
+		    public void run() {
+			adapter.add(line);
+			if (adapter.getCount() > N) {
+			    // fixme: おかしい。
+			    adapter.remove(adapter.getItem(0));
+			}
+		    }
+		});
+/*
 		synchronized (buffer) {
 		    buffer.append(line);
 		    buffer.append('\n');
@@ -268,6 +298,7 @@ public class MainActivity extends AppCompatActivity
 			}
 		    }
 		}
+*/
 		
 		if (remaining == 0)
 		    updateTextView();
