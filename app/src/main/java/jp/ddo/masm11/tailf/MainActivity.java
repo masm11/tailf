@@ -6,6 +6,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.view.ViewCompat;	// v13 にもあるが…?
+import android.support.design.widget.AppBarLayout;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 import android.content.Intent;
@@ -259,6 +260,9 @@ public class MainActivity extends AppCompatActivity
 			if (openingScroll) {
 			    ListView listView = (ListView) findViewById(R.id.listview);
 			    listView.setSelection(adapter.getCount() - 1);
+
+			    AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbarlayout);
+			    appBarLayout.setExpanded(false);
 			}
 		    }
 		});
