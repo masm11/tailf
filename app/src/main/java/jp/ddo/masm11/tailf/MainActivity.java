@@ -48,12 +48,7 @@ public class MainActivity extends AppCompatActivity
     private BufferedReader reader;
     private TailfThread tailfThread;
     private Thread thread;
-/*
-    private final StringBuilder buffer = new StringBuilder();
-*/
-    private int lineCount;	// synchronized (buffer) {} 内で。
     private Handler handler;
-    
     private ArrayAdapter<CharSequence> adapter;
     
     @Override
@@ -67,7 +62,6 @@ public class MainActivity extends AppCompatActivity
 	
 	handler = new Handler();
 	
-//	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 	adapter = new ArrayAdapter<CharSequence>(this, R.xml.line_layout);
 	ListView listView = (ListView) findViewById(R.id.listview);
 	listView.setAdapter(adapter);
@@ -187,10 +181,7 @@ public class MainActivity extends AppCompatActivity
     }
     
     private void openFile(File file) {
-	// buffer.setLength(0);
 	adapter.clear();
-	lineCount = 0;
-	updateTextView();
 	
 	try {
 	    baseStream = new EndlessFileInputStream(file);
@@ -226,39 +217,6 @@ public class MainActivity extends AppCompatActivity
 	}
     }
     
-    private void updateTextView() {
-	handler.post(new Runnable() {
-	    @Override
-	    public void run() {
-/*
-		final TextView textView = (TextView) findViewById(R.id.textview);
-		assert textView != null;
-*/
-/*
-		synchronized (buffer) {
-		    textView.setText(buffer);
-		}
-*/
-/*
-		Log.d("txt.height=%d", textView.getHeight());
-*/
-/*
-		final NestedScrollView nestedScrollView = (NestedScrollView) findViewById(R.id.scrollview);
-		nestedScrollView.post(new Runnable() {
-		    @Override
-		    public void run() {
-			Log.d("scr.amount=%d", nestedScrollView.getMaxScrollAmount());
-			Log.d("scr.scrollY=%d", nestedScrollView.getScrollY());
-			Log.d("txt.height=%d", textView.getHeight());
-			// nestedScrollView.fullScroll(NestedScrollView.FOCUS_DOWN);
-			nestedScrollView.scrollTo(0, textView.getHeight());
-		    }
-		});
-*/
-	    }
-	});
-    }
-    
     private void startThread() {
 	if (reader == null)
 	    return;
@@ -278,31 +236,12 @@ public class MainActivity extends AppCompatActivity
 		    public void run() {
 			adapter.add(line);
 			if (adapter.getCount() > N) {
-			    // fixme: おかしい。
+			    // remove は first occurence を削除するらしいので、
+			    // これでいいか。
 			    adapter.remove(adapter.getItem(0));
 			}
 		    }
 		});
-/*
-		synchronized (buffer) {
-		    buffer.append(line);
-		    buffer.append('\n');
-		    
-		    if (++lineCount > N) {
-			int max = buffer.length();
-			for (int i = 0; i < max; i++) {
-			    if (buffer.charAt(i) == '\n') {
-				buffer.delete(0, i + 1);
-				lineCount--;
-				break;
-			    }
-			}
-		    }
-		}
-*/
-		
-		if (remaining == 0)
-		    updateTextView();
 	    }
 	});
 	thread = new Thread(tailfThread);
