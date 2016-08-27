@@ -31,6 +31,7 @@ import android.net.Uri;
 import android.database.Cursor;
 import android.provider.DocumentsContract;
 import android.Manifest;
+import android.text.Spanned;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity
     private int lineCount;	// synchronized (buffer) {} 内で。
     private Handler handler;
     
-    private ArrayAdapter<String> adapter;
+    private ArrayAdapter<CharSequence> adapter;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity
 	handler = new Handler();
 	
 //	adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-	adapter = new ArrayAdapter<String>(this, R.xml.line_layout);
+	adapter = new ArrayAdapter<CharSequence>(this, R.xml.line_layout);
 	ListView listView = (ListView) findViewById(R.id.listview);
 	listView.setAdapter(adapter);
 	ViewCompat.setNestedScrollingEnabled(listView, true);
