@@ -1,4 +1,6 @@
 <to.tes.wordwrap.NoWrapTextView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
+    android:layout_height="wrap_content"
+    android:typeface="monospace"
+    android:textSize="10sp"/>
