@@ -23,6 +23,7 @@ import android.view.MenuInflater;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.AbsListView;
 import android.widget.Toast;
 import android.widget.ArrayAdapter;
 import android.app.ActionBar;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     private Thread thread;
     private Handler handler;
     private ArrayAdapter<CharSequence> adapter;
+    private boolean openingScroll;	// ファイルを開いた後の scroll 中?
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +68,19 @@ public class MainActivity extends AppCompatActivity
 	ListView listView = (ListView) findViewById(R.id.listview);
 	listView.setAdapter(adapter);
 	ViewCompat.setNestedScrollingEnabled(listView, true);
+	listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+	    @Override
+	    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+	    }
+	    
+	    @Override
+	    public void onScrollStateChanged(AbsListView view, int scrollState) {
+		// 手で scroll したら終わりってことで。
+		// あとは transcriptMode="normal" に任せる。
+		if (scrollState != AbsListView.OnScrollListener.SCROLL_STATE_IDLE)
+		    openingScroll = false;
+	    }
+	});
 	
 	if (savedInstanceState != null) {
 	    Log.d("savedInstanceState exists.");
@@ -182,6 +197,7 @@ public class MainActivity extends AppCompatActivity
     
     private void openFile(File file) {
 	adapter.clear();
+	openingScroll = true;
 	
 	try {
 	    baseStream = new EndlessFileInputStream(file);
@@ -239,6 +255,10 @@ public class MainActivity extends AppCompatActivity
 			    // remove は first occurence を削除するらしいので、
 			    // これでいいか。
 			    adapter.remove(adapter.getItem(0));
+			}
+			if (openingScroll) {
+			    ListView listView = (ListView) findViewById(R.id.listview);
+			    listView.setSelection(adapter.getCount() - 1);
 			}
 		    }
 		});
