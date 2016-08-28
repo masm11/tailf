@@ -110,15 +110,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
 	switch (item.getItemId()) {
 	case R.id.action_open:
-/*
-	    Intent intent = FileUtils.createGetContentIntent();
-	    intent.setType(FileUtils.MIME_TYPE_TEXT);
-	    Intent i = Intent.createChooser(intent, "Select a file");
-	    startActivityForResult(i, 0);
-*/
 	    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 	    intent.addCategory(Intent.CATEGORY_OPENABLE);
-	    intent.setType("text/*");
+	    intent.setType("*/*");
 	    startActivityForResult(intent, 0);
 	    return true;
 	    
@@ -133,11 +127,12 @@ public class MainActivity extends AppCompatActivity
 	    if (data != null) {
 		Uri uri = data.getData();
 		Log.d("uri=%s", uri.toString());
-/*
 		file = FileUtils.getFile(this, uri);
-		Log.d("file=%s", file.toString());
-*/
-		
+		Log.d("file=%s", file == null ? "null" : file.toString());
+		if (file == null) {
+		    Log.i("Couldn't get file path.");
+		} else
+		    open();
 /*
 		if (FileUtils.isExternalStorageDocument(uri)) {
 		    Log.d("is external storage document.");
