@@ -10,6 +10,10 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        def documentsAuthorityValue = "jp.ddo.masm11.tailf.documents"
+        manifestPlaceholders = [documentsAuthority: documentsAuthorityValue]
+        buildConfigField "String", "DOCUMENTS_AUTHORITY", "\"${documentsAuthorityValue}\""
     }
     buildTypes {
         release {

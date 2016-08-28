@@ -40,7 +40,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
 import java.util.ArrayList;
-import com.ipaulpro.afilechooser.utils.FileUtils;
 
 public class MainActivity extends AppCompatActivity
     implements ActivityCompat.OnRequestPermissionsResultCallback {
@@ -111,10 +110,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
 	switch (item.getItemId()) {
 	case R.id.action_open:
+/*
 	    Intent intent = FileUtils.createGetContentIntent();
 	    intent.setType(FileUtils.MIME_TYPE_TEXT);
 	    Intent i = Intent.createChooser(intent, "Select a file");
 	    startActivityForResult(i, 0);
+*/
+	    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+	    intent.setType("text/*");
+	    startActivityForResult(intent, 0);
 	    return true;
 	    
 	default:
@@ -127,15 +132,20 @@ public class MainActivity extends AppCompatActivity
 	if (requestCode == 0) {
 	    if (data != null) {
 		Uri uri = data.getData();
+		Log.d("uri=%s", uri.toString());
+/*
 		file = FileUtils.getFile(this, uri);
 		Log.d("file=%s", file.toString());
+*/
 		
+/*
 		if (FileUtils.isExternalStorageDocument(uri)) {
 		    Log.d("is external storage document.");
-		    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+		    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 			Log.d("permission not granted.");
 			String[] permissions = new String[] {
 			    Manifest.permission.READ_EXTERNAL_STORAGE,
+			    Manifest.permission.WRITE_EXTERNAL_STORAGE,
 			};
 			ActivityCompat.requestPermissions(this, permissions, 0);
 		    } else {
@@ -146,6 +156,7 @@ public class MainActivity extends AppCompatActivity
 		    Log.d("is not external storage document.");
 		    open();
 		}
+*/
 	    } else
 		Log.w("data=null");
 	}

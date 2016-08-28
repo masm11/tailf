@@ -3,6 +3,7 @@
           package="jp.ddo.masm11.tailf">
 
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -35,6 +36,18 @@
 	  </intent-filter>
 	</activity>
 	
+        <provider
+            android:name="jp.ddo.masm11.tailf.FileSystemProvider"
+            android:authorities="${documentsAuthority}"
+            android:exported="true"
+            android:grantUriPermissions="true"
+	    android:enabled="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER"/>
+            </intent-filter>
+        </provider>
+
     </application>
 
 </manifest>
