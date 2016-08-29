@@ -77,15 +77,27 @@ public class MainActivity extends AppCompatActivity
 	    Intent intent = getIntent();
 	    if (intent != null) {
 		Log.d("intent exists.");
-		Uri uri = intent.getData();
-		if (uri != null) {
-		    Log.d("uri=%s", uri.toString());
-		    file = FileUtils.getFile(this, uri);
-		    if (file == null) {
-			Log.i("Couldn't get file path.");
-		    } else {
-			Log.d("file=%s", file.toString());
-			openFile(file);
+		String action = intent.getAction();
+		Log.d("action=%s", action == null ? "null" : action);
+		java.util.Set<String> cats = intent.getCategories();
+		if (cats != null) {
+		    for (String s: cats) {
+			Log.d("category=%s", s);
+		    }
+		}
+		
+		if (action != null && action.equals(Intent.ACTION_VIEW)) {
+		    Log.d("is view.");
+		    Uri uri = intent.getData();
+		    if (uri != null) {
+			Log.d("uri=%s", uri.toString());
+			file = FileUtils.getFile(this, uri);
+			if (file == null) {
+			    Log.i("Couldn't get file path.");
+			} else {
+			    Log.d("file=%s", file.toString());
+			    openFile(file);
+			}
 		    }
 		}
 	    }
@@ -175,6 +187,7 @@ public class MainActivity extends AppCompatActivity
     
     @Override
     protected void onDestroy() {
+	Log.d("");
 	closeFile();
 	
 	super.onDestroy();
