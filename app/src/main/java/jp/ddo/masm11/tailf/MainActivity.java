@@ -89,6 +89,22 @@ public class MainActivity extends AppCompatActivity
 		Log.d("savedInstanceState: file=%s", file.toString());
 		openFile(file);
 	    }
+	} else {
+	    Intent intent = getIntent();
+	    if (intent != null) {
+		Log.d("intent exists.");
+		Uri uri = intent.getData();
+		if (uri != null) {
+		    Log.d("uri=%s", uri.toString());
+		    file = FileUtils.getFile(this, uri);
+		    if (file == null) {
+			Log.i("Couldn't get file path.");
+		    } else {
+			Log.d("file=%s", file.toString());
+			openFile(file);
+		    }
+		}
+	    }
 	}
     }
     
