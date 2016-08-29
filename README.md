@@ -14,8 +14,8 @@
 
 以下の環境で動作確認をしています。
 
-  Xperia X Performance
-  Android 6.0.1
+  - Xperia X Performance
+  - Android 6.0.1
 
 たぶん、古い Android では動かないと思います。
 
@@ -26,7 +26,7 @@ Google Play には置いていませんので、Android Studio からビルド�
 
 権限は、以下のものを使用しています。
 
-  android.permission.READ_EXTERNAL_STORAGE
+  - android.permission.READ_EXTERNAL_STORAGE
 
 # 使い方
 
@@ -41,7 +41,7 @@ Google Play には置いていませんので、Android Studio からビルド�
 ファイルの終端から 1000行分を持っていますので、
 そこまでなら scroll もできます。
 
-ファイルを選択する際、選択はどのファイルでも(テキストファイルでなくても)
+ファイルを選択する際、選択はどのファイルでも (テキストファイルでなくても)
 できますが、開けるかどうかは別問題です。また、開けたとしても、
 画像ファイルとかだとまともには表示されません。
 
@@ -51,6 +51,7 @@ File Manager のようなアプリから呼び出すこともできます。
 
 テキストファイルを開く際に、使えるアプリのリストに Tailf が
 あると思いますので、それを選択してください。
+
 単体で使う場合と異なり、テキストファイルと認識されないと
 Tailf は呼び出せません。
 
@@ -58,15 +59,16 @@ Tailf は呼び出せません。
 
 ファイル選択時に「ファイルシステム」というプロバイダを選択できます。
 / から、見えるファイルやディレクトリは全て見えます。
-開けないファイルやディレクトリも多いですが。
+ただし、開けないファイルやディレクトリもたくさんあります。
 
 root がなくてもできるようなことしかしてませんので、root を取る必要は
 ありません。
 
 # バグ
 
-Android Mashmallow の FileObserver のバグのため、inotify が使えて
-いません。仕方ないので1秒ごとに確認しています。
+Android Mashmallow の FileObserver のバグのため、
+inotify が使えていません。
+仕方ないので1秒ごとに確認しています。
 
 # ライセンス
 
@@ -74,4 +76,4 @@ GPL3 とします。COPYING ファイルを参照してください。
 
 # 作者
 
-Yuuki Harano <masm@masm11.ddo.jp>
+Yuuki Harano &lt;masm@masm11.ddo.jp&gt;
