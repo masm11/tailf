@@ -1,45 +1,28 @@
 package jp.ddo.masm11.tailf;
 
-import android.support.v4.widget.NestedScrollView;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.view.ViewCompat;	// v13 にもあるが…?
 import android.support.design.widget.AppBarLayout;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
 import android.content.Intent;
-import android.content.Context;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.AsyncTask;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuInflater;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.AbsListView;
-import android.widget.Toast;
 import android.widget.ArrayAdapter;
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.net.Uri;
-import android.database.Cursor;
-import android.provider.DocumentsContract;
-import android.Manifest;
-import android.text.Spanned;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.File;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
     implements ActivityCompat.OnRequestPermissionsResultCallback {
@@ -64,8 +47,9 @@ public class MainActivity extends AppCompatActivity
 	
 	handler = new Handler();
 	
-	adapter = new ArrayAdapter<CharSequence>(this, R.xml.line_layout);
+	adapter = new ArrayAdapter<>(this, R.layout.line_layout);
 	ListView listView = (ListView) findViewById(R.id.listview);
+	assert listView != null;
 	listView.setAdapter(adapter);
 	ViewCompat.setNestedScrollingEnabled(listView, true);
 	listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -198,8 +182,8 @@ public class MainActivity extends AppCompatActivity
     
     @Override
     public void onRequestPermissionsResult(int requestCode,
-	    String[] permissions,
-	    int[] grantResults) {
+	    @NonNull String[] permissions,
+	    @NonNull int[] grantResults) {
 	if (requestCode == 0) {
 	    if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
 		open();
@@ -281,9 +265,11 @@ public class MainActivity extends AppCompatActivity
 			}
 			if (openingScroll) {
 			    ListView listView = (ListView) findViewById(R.id.listview);
+			    assert listView != null;
 			    listView.setSelection(adapter.getCount() - 1);
 
 			    AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbarlayout);
+			    assert appBarLayout != null;
 			    appBarLayout.setExpanded(false);
 			}
 		    }

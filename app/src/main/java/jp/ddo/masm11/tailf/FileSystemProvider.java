@@ -6,14 +6,9 @@ package jp.ddo.masm11.tailf;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.MatrixCursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.os.CancellationSignal;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.os.StatFs;
 import android.provider.DocumentsContract;
@@ -22,14 +17,10 @@ import android.provider.DocumentsContract.Root;
 import android.provider.DocumentsProvider;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.os.EnvironmentCompat;
-import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class FileSystemProvider extends DocumentsProvider {
     /**
@@ -52,7 +43,7 @@ public class FileSystemProvider extends DocumentsProvider {
      * @param context The current Context
      * @return whether the permission has been granted it is safe to proceed
      */
-    static boolean isMissingPermission(@Nullable Context context) {
+    private static boolean isMissingPermission(@Nullable Context context) {
         if (context == null) {
             return true;
         }
@@ -68,9 +59,6 @@ public class FileSystemProvider extends DocumentsProvider {
 
     @Override
     public Cursor queryRoots(final String[] projection) throws FileNotFoundException {
-	Log.d("getContext()=%s", getContext().toString());
-	Log.d("package=%s", getContext().getPackageName().toString());
-	Log.d("granted=%d", ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE));
         if (getContext() == null || ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 	    Log.d("queryRoots = null.");

@@ -83,16 +83,20 @@ class FileUtils {
 		    return null;
 		}
                 String type = split[0];
-                Uri contentUri = null;
-		if (type.equals("image")) {
+                Uri contentUri;
+		switch (type) {
+		case "image":
 		    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                } else if (type.equals("video")) {
+		    break;
+                case "video":
                     contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                } else if (type.equals("audio")) {
+		    break;
+                case "audio":
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-		}
-		if (contentUri == null)
+		    break;
+		default:
 		    return null;
+		}
 		String path = getDataColumn(context, contentUri, "_id=?", new String[] { split[1] });
 		if (path == null)
 		    return null;

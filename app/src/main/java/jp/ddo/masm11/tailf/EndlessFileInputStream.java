@@ -1,5 +1,6 @@
 package jp.ddo.masm11.tailf;
 
+import android.support.annotation.NonNull;
 import android.os.FileObserver;
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -42,7 +43,7 @@ class EndlessFileInputStream extends InputStream {
       なんか反応悪いけど…
     */
     private class Watcher implements Runnable {
-	private File file;
+	private final File file;
 	Watcher(File file) {
 	    this.file = file;
 	    Log.d("file=%s", file.toString());
@@ -81,7 +82,7 @@ class EndlessFileInputStream extends InputStream {
     
     private Watcher watcher;
     private Thread thread;
-    private File file;
+    private final File file;
     private long mark;
     private FileChannel channel;
     private MappedByteBuffer buf;
@@ -173,7 +174,7 @@ class EndlessFileInputStream extends InputStream {
     }
     
     @Override
-    public int read(byte[] b, int off, int len)
+    public int read(@NonNull byte[] b, int off, int len)
 	    throws IOException {
 	synchronized (this) {
 	    while (buf.remaining() <= 0) {

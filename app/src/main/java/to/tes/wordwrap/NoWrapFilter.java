@@ -9,7 +9,7 @@ import android.text.TextPaint;
 import android.widget.TextView;
 
 // TextViewの幅に合わせて改行を挿入するInputFilter - 英単語を途中で分断しない
-public class NoWrapFilter implements InputFilter {
+class NoWrapFilter implements InputFilter {
     private final TextView view;
 
     public NoWrapFilter(TextView view) {

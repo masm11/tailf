@@ -1,9 +1,7 @@
 package jp.ddo.masm11.tailf;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.File;
 
 class TailfThread implements Runnable {
     interface LineListener {
@@ -27,7 +25,7 @@ class TailfThread implements Runnable {
 		String line = reader.readLine();
 		int remaining = baseStream.available();
 		lineListener.onRead(line, remaining);
-		if (Thread.currentThread().interrupted())
+		if (Thread.interrupted())
 		    break;
 	    }
 	} catch (IOException e) {

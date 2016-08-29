@@ -29,7 +29,7 @@ class Log {
 	}
     }
     
-    private static final LinkedList<Item> queue = new LinkedList<Item>();
+    private static final LinkedList<Item> queue = new LinkedList<>();
     
     private static class Logger implements Runnable {
 	public void run() {
@@ -61,11 +61,11 @@ class Log {
 		    }
 		}
 	    } catch (InterruptedException e) {
+		android.util.Log.d("Logger", "interrupted", e);
 	    }
 	}
     }
     
-    private static Thread thread;
     static void init(File dir) {
 	File logFile = new File(dir, "log.txt");
 	
@@ -81,7 +81,7 @@ class Log {
 	    android.util.Log.e("Log", "ioexception", e);
 	}
 	
-	thread = new Thread(new Logger());
+	Thread thread = new Thread(new Logger());
 	thread.start();
     }
     
@@ -119,7 +119,6 @@ class Log {
     
     private static void common(int priority, Throwable e, String fmt, Object... args) {
 	String[] stkinf = getStackInfo();
-	String klass = stkinf[0];
 	String msg = String.format(fmt, args);
 	Item item = new Item(priority, e, msg, stkinf[0], stkinf[1], new Date());
 	synchronized (queue) {
