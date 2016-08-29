@@ -1,11 +1,6 @@
 <resources>
     <string name="app_name">Tailf</string>
-    <string name="cancel">Cancel</string>
-    <string name="empty_directory">Empty Directory</string>
-    <string name="storage_removed">Storage was removed or unmounted.</string>
-    <string name="choose_file">Select a file</string>
-    <string name="error_selecting_file">Error selecting File</string>
-    <string name="internal_storage">Internal storage</string>
-    <string name="sd_card">SD Card</string>
+    <string name="ok">OK</string>
     <string name="filesystem">File System</string>
+    <string name="open">Open&#8230;</string>
 </resources>

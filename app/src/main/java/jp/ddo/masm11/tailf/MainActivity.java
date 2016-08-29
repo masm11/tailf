@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity
 	    
 	    AlertDialog dialog = new AlertDialog.Builder(this)
 		    .setMessage("Couldn't open the file.")
-		    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+		    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
 			    // NOP.
