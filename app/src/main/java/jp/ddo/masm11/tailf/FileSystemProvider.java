@@ -3,20 +3,14 @@
 
 package jp.ddo.masm11.tailf;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.os.CancellationSignal;
 import android.os.ParcelFileDescriptor;
 import android.os.StatFs;
-import android.provider.DocumentsContract;
 import android.provider.DocumentsContract.Document;
 import android.provider.DocumentsContract.Root;
 import android.provider.DocumentsProvider;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
