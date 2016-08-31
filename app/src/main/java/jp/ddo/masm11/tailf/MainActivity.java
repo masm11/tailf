@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity
 	    String[] permissions = new String[] {
 		Manifest.permission.READ_EXTERNAL_STORAGE,
 	    };
-	    ActivityCompat.requestPermissions(MainActivity.this, permissions, REQ_PERMISSION_ON_CREATE);
+	    ActivityCompat.requestPermissions(this, permissions, REQ_PERMISSION_ON_CREATE);
 	}
     }
     
