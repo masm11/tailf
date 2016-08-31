@@ -240,7 +240,7 @@ public class MainActivity extends AppCompatActivity
 	    closeFile();
 	    
 	    AlertDialog dialog = new AlertDialog.Builder(this)
-		    .setMessage("Couldn't open the file.")
+		    .setMessage(R.string.couldnt_open_file)
 		    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int id) {
