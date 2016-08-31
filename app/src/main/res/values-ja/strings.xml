@@ -3,4 +3,6 @@
     <string name="ok">OK</string>
     <string name="filesystem">ファイルシステム</string>
     <string name="open">開く&#8230;</string>
+    <string name="please_grant_permission">内部ストレージにアクセスするには権限が必要です。次のダイアログで許可してください。
+    内部ストレージにアクセスしないなら、許可は不要です。</string>
 </resources>

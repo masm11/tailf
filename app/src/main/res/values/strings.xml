@@ -3,4 +3,6 @@
     <string name="ok">OK</string>
     <string name="filesystem">File System</string>
     <string name="open">Open&#8230;</string>
+    <string name="please_grant_permission">You need to grant a permission to access the internal storage. Please do on the following dialog.
+    If you are not going to access the internal storage, You do not need to grant the permission.</string>
 </resources>

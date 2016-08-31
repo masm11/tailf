@@ -2,6 +2,7 @@ package jp.ddo.masm11.tailf;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.support.v4.view.ViewCompat;	// v13 にもあるが…?
@@ -19,6 +20,7 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.app.AlertDialog;
 import android.net.Uri;
+import android.Manifest;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +28,9 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity
     implements ActivityCompat.OnRequestPermissionsResultCallback {
+    private static final int REQ_PERMISSION_ON_CREATE = 1;
+    private static final int REQ_FILE_SELECTION = 2;
+    
     private static final int N = 1000;
     private File file;
     private EndlessFileInputStream baseStream;
@@ -69,10 +74,6 @@ public class MainActivity extends AppCompatActivity
 	if (savedInstanceState != null) {
 	    Log.d("savedInstanceState exists.");
 	    file = (File) savedInstanceState.getSerializable("file");
-	    if (file != null) {
-		Log.d("savedInstanceState: file=%s", file.toString());
-		openFile(file);
-	    }
 	} else {
 	    Intent intent = getIntent();
 	    if (intent != null) {
@@ -92,15 +93,40 @@ public class MainActivity extends AppCompatActivity
 		    if (uri != null) {
 			Log.d("uri=%s", uri.toString());
 			file = FileUtils.getFile(this, uri);
-			if (file == null) {
+			if (file == null)
 			    Log.i("Couldn't get file path.");
-			} else {
-			    Log.d("file=%s", file.toString());
-			    openFile(file);
-			}
 		    }
 		}
 	    }
+	}
+	
+	if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+	    // permission がある => ファイルを開くなら開く。
+	    if (file != null) {
+		Log.d("file=%s", file.toString());
+		openFile(file);
+	    }
+	} else if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+	    // permission がない && 説明を表示すべき => 説明を表示した後、request。
+	    AlertDialog dialog = new AlertDialog.Builder(this)
+		    .setMessage(R.string.please_grant_permission)
+		    .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+			    String[] permissions = new String[] {
+				Manifest.permission.READ_EXTERNAL_STORAGE,
+			    };
+			    ActivityCompat.requestPermissions(MainActivity.this, permissions, REQ_PERMISSION_ON_CREATE);
+			}
+		    })
+		    .create();
+	    dialog.show();
+	} else {
+	    // permission がない && 説明不要 => request。
+	    String[] permissions = new String[] {
+		Manifest.permission.READ_EXTERNAL_STORAGE,
+	    };
+	    ActivityCompat.requestPermissions(MainActivity.this, permissions, REQ_PERMISSION_ON_CREATE);
 	}
     }
     
@@ -125,7 +151,7 @@ public class MainActivity extends AppCompatActivity
 	    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 	    intent.addCategory(Intent.CATEGORY_OPENABLE);
 	    intent.setType("*/*");
-	    startActivityForResult(intent, 0);
+	    startActivityForResult(intent, REQ_FILE_SELECTION);
 	    return true;
 	    
 	default:
@@ -135,37 +161,17 @@ public class MainActivity extends AppCompatActivity
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	if (requestCode == 0) {
-	    if (data != null) {
+	if (requestCode == REQ_FILE_SELECTION) {
+	    if (resultCode == RESULT_OK) {
 		Uri uri = data.getData();
 		Log.d("uri=%s", uri.toString());
 		file = FileUtils.getFile(this, uri);
 		Log.d("file=%s", file == null ? "null" : file.toString());
-		if (file == null) {
+		if (file == null)
 		    Log.i("Couldn't get file path.");
-		} else
+		else
 		    open();
-/*
-		if (FileUtils.isExternalStorageDocument(uri)) {
-		    Log.d("is external storage document.");
-		    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-			Log.d("permission not granted.");
-			String[] permissions = new String[] {
-			    Manifest.permission.READ_EXTERNAL_STORAGE,
-			    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-			};
-			ActivityCompat.requestPermissions(this, permissions, 0);
-		    } else {
-			Log.d("permission already granted.");
-			open();
-		    }
-		} else {
-		    Log.d("is not external storage document.");
-		    open();
-		}
-*/
-	    } else
-		Log.w("data=null");
+	    }
 	}
 	
 	super.onActivityResult(requestCode, resultCode, data);
@@ -197,9 +203,14 @@ public class MainActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode,
 	    @NonNull String[] permissions,
 	    @NonNull int[] grantResults) {
-	if (requestCode == 0) {
-	    if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-		open();
+	if (requestCode == REQ_PERMISSION_ON_CREATE) {
+	    /* 結果に関わらず、アクセスはする。
+	     * で、エラーならエラー dialog を表示する。
+	     */
+	    if (file != null) {
+		Log.d("file=%s", file.toString());
+		openFile(file);
+	    }
 	}
     }
     
