@@ -71,7 +71,7 @@ root を取る必要はありません。
 
 # バグ
 
-Android Mashmallow の FileObserver のバグのため、
+Android Marshmallow の FileObserver のバグのため、
 inotify が使えていません。
 仕方ないので1秒ごとに確認しています。
 

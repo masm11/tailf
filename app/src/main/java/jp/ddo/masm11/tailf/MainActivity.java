@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity
 		    public void run() {
 			adapter.add(line);
 			if (adapter.getCount() > N) {
-			    // remove は first occurence を削除するらしいので、
+			    // remove は first occurrence を削除するらしいので、
 			    // これでいいか。
 			    adapter.remove(adapter.getItem(0));
 			}
