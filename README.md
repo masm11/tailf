@@ -1,5 +1,3 @@
-まだ開発中...
-
 # Tailf とは?
 
 昔から UNIX の tail コマンドには -f オプションがあります。
@@ -71,8 +69,7 @@ root を取る必要はありません。
 
 # バグ
 
-Android Marshmallow の FileObserver のバグのため、
-inotify が使えていません。
+Android Marshmallow のバグのため、FileObserver が使えていません。
 仕方ないので1秒ごとに確認しています。
 
 # ライセンス
