@@ -1,12 +1,13 @@
 # What is Tailf?
 
-UNIX tailf command supports the -f option.
-It watch the file modification once per 1sec, and output appended data.
+UNIX tail command supports the -f option.
+It watches the file modification once per 1sec,
+and output appended data to the screen.
 
 Recent Linux distributions has tailf command.
 It receives file modification event with inotify system calls
 instead of watching the file once per 1sec,
-and output appended data.
+and output appended data to the screen.
 
 This Tailf app displays appended data on the screen,
 like Linux's tailf command.
@@ -26,7 +27,7 @@ Xperia X Performance.
 
 # Installation
 
-I don't put on Google Play, so you need to build and install
+I don't put the app on Google Play, so you need to build and install
 the app on Android Studio.
 
 The app uses the following permission.
@@ -44,12 +45,12 @@ When the file is appended, the screen is updated.
 
 The app has 1000 lines from the end of the file, so you can scroll.
 
-When you select a file, you can select any file (or something),
-but whether the app can open it is another problem.
+When you select a file, you can select any file (even if it is
+ther than a text file) but whether the app can open it is another problem.
 Also, even if the app can open it, it is not displayed normally
 if it is an image file or such.
 
-# Invoke from other app
+# Invoke from other apps
 
 You can invoke the Tailf app from other apps like File Manager.
 
@@ -66,12 +67,12 @@ But there are many files and directories the app can't open
 even if you can see them.
 
 You don't have to get root since the app do only things
-it can to without root.
+it can without root.
 
 # Bugs
 
 Android Marshmallow has the critical bug, so I don't use FileObserver.
-The app watch a file once per 1sec.
+The app watches a file once per 1sec.
 
 # License
 
