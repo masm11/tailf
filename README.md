@@ -1,3 +1,5 @@
+For english, see README_en.md.
+
 # Tailf とは?
 
 昔から UNIX の tail コマンドには -f オプションがあります。
