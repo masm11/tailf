@@ -6,6 +6,7 @@ import java.io.IOException;
 class TailfThread implements Runnable {
     interface LineListener {
 	void onRead(String line, int remaining);
+	void onEOF();
     }
     
     private final BufferedReader reader;
@@ -23,6 +24,10 @@ class TailfThread implements Runnable {
 	try {
 	    while (true) {
 		String line = reader.readLine();
+		if (line == null) {
+		    lineListener.onEOF();
+		    break;
+		}
 		int remaining = baseStream.available();
 		lineListener.onRead(line, remaining);
 		if (Thread.interrupted())

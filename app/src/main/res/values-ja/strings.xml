@@ -6,4 +6,5 @@
     <string name="please_grant_permission">内部ストレージにアクセスするには権限が必要です。次のダイアログで許可してください。
     内部ストレージにアクセスしないなら、許可は不要です。</string>
     <string name="couldnt_open_file">ファイルを開けませんでした。</string>
+    <string name="file_was_truncated">ファイルが短くなりました。</string>
 </resources>

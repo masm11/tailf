@@ -53,6 +53,12 @@ class EndlessFileInputStream extends InputStream {
 		long cur_size = -1;
 		while (true) {
 		    synchronized (EndlessFileInputStream.this) {
+			if (cur_size > channel.size()) {
+			    Log.d("truncated.");
+			    truncated = true;
+			    EndlessFileInputStream.this.notifyAll();
+			    break;
+			}
 			if (cur_size != channel.size()) {
 			    Log.d("size changed.");
 			    cur_size = channel.size();
@@ -86,6 +92,7 @@ class EndlessFileInputStream extends InputStream {
     private long mark;
     private FileChannel channel;
     private MappedByteBuffer buf;
+    private boolean truncated;
     
     EndlessFileInputStream(File file)
 	    throws IOException {
@@ -168,6 +175,8 @@ class EndlessFileInputStream extends InputStream {
 		} catch (InterruptedException e) {
 		    throw new IOException(e);
 		}
+		if (truncated)
+		    return -1;
 	    }
 	    return buf.get();
 	}
@@ -183,6 +192,8 @@ class EndlessFileInputStream extends InputStream {
 		} catch (InterruptedException e) {
 		    throw new IOException(e);
 		}
+		if (truncated)
+		    return -1;
 	    }
 	    if (len > buf.remaining())
 		len = buf.remaining();

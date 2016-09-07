@@ -355,6 +355,23 @@ public class MainActivity extends AppCompatActivity
 		    }
 		});
 	    }
+	    @Override
+	    public void onEOF() {
+		handler.post(new Runnable() {
+		    @Override
+		    public void run() {
+			AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+				.setMessage(R.string.file_was_truncated)
+				.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int id) {
+				    }
+				})
+				.create();
+			dialog.show();
+		    }
+		});
+	    }
 	});
 	thread = new Thread(tailfThread);
 	thread.start();
