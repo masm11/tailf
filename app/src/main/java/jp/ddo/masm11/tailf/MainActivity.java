@@ -39,7 +39,26 @@ public class MainActivity extends AppCompatActivity
     private Thread thread;
     private Handler handler;
     private ArrayAdapter<CharSequence> adapter;
-    private boolean openingScroll;	// ファイルを開いた後の scroll 中?
+    
+    /* ファイルが開いた後は、目的地まで自動で scroll する。
+     * その処理中かどうか。
+     */
+    private boolean openingScroll;
+    
+    /* 現在の scroll 位置。画面の最下部の位置。
+     * 画面を回転した時には、openingScroll において、ここまで scroll する。
+     */
+    private int currentScrollPos;
+    
+    /* 現在 autoScroll 中かどうか。
+     * autoScroll 中に画面を回転した時には、currentScrollPos に関わらず、
+     * 最後まで scroll する。
+     */
+    private boolean autoScroll;
+    
+    private boolean hasFromSavedInstance;
+    private int currentScrollPosFromSavedInstance;
+    private boolean autoScrollFromSavedInstance;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +79,9 @@ public class MainActivity extends AppCompatActivity
 	listView.setOnScrollListener(new AbsListView.OnScrollListener() {
 	    @Override
 	    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+		currentScrollPos = firstVisibleItem + visibleItemCount - 1;
+		autoScroll = (currentScrollPos >= totalItemCount - 1);
+		Log.d("currentScrollPos=%d, autoScroll=%b", currentScrollPos, autoScroll);
 	    }
 	    
 	    @Override
@@ -74,6 +96,9 @@ public class MainActivity extends AppCompatActivity
 	if (savedInstanceState != null) {
 	    Log.d("savedInstanceState exists.");
 	    file = (File) savedInstanceState.getSerializable("file");
+	    currentScrollPosFromSavedInstance = savedInstanceState.getInt("currentScrollPos");
+	    autoScrollFromSavedInstance = savedInstanceState.getBoolean("autoScroll");
+	    hasFromSavedInstance = true;
 	} else {
 	    Intent intent = getIntent();
 	    if (intent != null) {
@@ -128,6 +153,9 @@ public class MainActivity extends AppCompatActivity
 	    };
 	    ActivityCompat.requestPermissions(this, permissions, REQ_PERMISSION_ON_CREATE);
 	}
+	Log.d("currentScrollPosFromSavedInstance=%d", currentScrollPosFromSavedInstance);
+	Log.d("autoScrollFromSavedInstance=%b", autoScrollFromSavedInstance);
+	Log.d("hasFromSavedInstance=%b", hasFromSavedInstance);
     }
     
     @Override
@@ -135,6 +163,8 @@ public class MainActivity extends AppCompatActivity
 	Log.d("");
 	super.onSaveInstanceState(outState);
 	outState.putSerializable("file", file);
+	outState.putInt("currentScrollPos", currentScrollPos);
+	outState.putBoolean("autoScroll", autoScroll);
     }
     
     @Override
@@ -215,6 +245,8 @@ public class MainActivity extends AppCompatActivity
     }
     
     private void open() {
+	hasFromSavedInstance = false;
+	
 	if (thread != null) {
 	    stopThread();
 	    closeFile();
@@ -229,6 +261,8 @@ public class MainActivity extends AppCompatActivity
     private void openFile(File file) {
 	adapter.clear();
 	openingScroll = true;
+	currentScrollPos = 0;
+	autoScroll = true;
 	
 	try {
 	    baseStream = new EndlessFileInputStream(file);
@@ -276,8 +310,8 @@ public class MainActivity extends AppCompatActivity
 	tailfThread = new TailfThread(reader, baseStream, new TailfThread.LineListener() {
 	    @Override
 	    public void onRead(final String line, int remaining) {
-		Log.d("line=%s", line);
-		Log.d("remaining=%d", remaining);
+		// Log.d("line=%s", line);
+		// Log.d("remaining=%d", remaining);
 		handler.post(new Runnable() {
 		    @Override
 		    public void run() {
@@ -290,8 +324,30 @@ public class MainActivity extends AppCompatActivity
 			if (openingScroll) {
 			    ListView listView = (ListView) findViewById(R.id.listview);
 			    assert listView != null;
-			    listView.setSelection(adapter.getCount() - 1);
-
+			    
+			    int newpos;
+			    char r;
+			    if (hasFromSavedInstance) {
+				if (autoScrollFromSavedInstance) {
+				    newpos = adapter.getCount() - 1;
+				    r = 'a';
+				} else {
+				    if (currentScrollPosFromSavedInstance > adapter.getCount() - 1) {
+					newpos = adapter.getCount() - 1;
+					r = 'A';
+				    } else {
+					newpos = currentScrollPosFromSavedInstance;
+					r = 'c';
+				    }
+				}
+			    } else {
+				newpos = adapter.getCount() - 1;
+				r = 'n';
+			    }
+			    Log.d("newpos=%d/%c", newpos, r);
+			    listView.setSelection(newpos);
+			    // fixme: transcriptMode をうまく調整してみる?
+			    
 			    AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbarlayout);
 			    assert appBarLayout != null;
 			    appBarLayout.setExpanded(false);
